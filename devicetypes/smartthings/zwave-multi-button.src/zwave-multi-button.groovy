@@ -24,6 +24,8 @@ metadata {
 		capability "Health Check"
 		capability "Configuration"
 
+		attribute "lastSequence", "number"
+
 		// While adding new device to this DTH, remember to update method getProdNumberOfButtons()
 		fingerprint mfr: "010F", prod: "1001", model: "1000", deviceJoinName: "Fibaro KeyFob", mnmn: "SmartThings", vid: "generic-6-button" //EU
 		fingerprint mfr: "010F", prod: "1001", model: "2000", deviceJoinName: "Fibaro KeyFob", mnmn: "SmartThings", vid: "generic-6-button"  //US
@@ -138,11 +140,18 @@ def zwaveEvent(physicalgraph.zwave.commands.sceneactivationv1.SceneActivationSet
 }
 
 def zwaveEvent(physicalgraph.zwave.commands.centralscenev1.CentralSceneNotification cmd) {
-	def value = eventsMap[(int) cmd.keyAttributes]
-	def description = "Button no. ${cmd.sceneNumber} was ${value}"
-	def event = createEvent(name: "button", value: value, descriptionText: description, data: [buttonNumber: cmd.sceneNumber], isStateChange: true)
-	sendEventToChild(cmd.sceneNumber, event)
-	return event
+
+	if (device.currentValue("lastSequence") != cmd.sequenceNumber){
+		sendEvent(name: "sequenceNumber", value: cmd.sequenceNumber, displayed: false)
+
+        def value = eventsMap[(int) cmd.keyAttributes]
+        def description = "Button no. ${cmd.sceneNumber} was ${value}"
+        def event = createEvent(name: "button", value: value, descriptionText: description, data: [buttonNumber: cmd.sceneNumber], isStateChange: true)
+        sendEventToChild(cmd.sceneNumber, event)
+		return event
+	} else {
+		log.warn "Duplicate sequenceNumber dropped!"
+	}
 }
 
 def sendEventToChild(buttonNumber, event) {
@@ -225,7 +234,7 @@ private getProdNumberOfButtons() {[
 private getSupportedButtonValues() {
 	def values = ["pushed", "held"]
 	if (isFibaro()) values += ["double", "down_hold", "pushed_3x"]
-	if (isRemotec()) values += ["double", "down_hold"]
+    if (isRemotec()) values += ["double", "down_hold"]
 	return values
 }
 
