@@ -33,7 +33,7 @@ metadata {
 		fingerprint mfr: "0086", prod: "0001", model: "0058", deviceJoinName: "Aeotec KeyFob", mnmn: "SmartThings", vid: "generic-4-button" //EU
 		fingerprint mfr: "010F", prod: "1001", model: "3000", deviceJoinName: "Fibaro KeyFob", mnmn: "SmartThings", vid: "generic-6-button" //AU
 		fingerprint mfr: "0208", prod: "0200", model: "000B", deviceJoinName: "Hank Four-key Scene Controller", mnmn: "SmartThings", vid: "generic-4-button" //EU
-		fingerprint mfr: "0208", prod: "0201", model: "000B", deviceJoinName: "Hank Four-key Scene Controller", mnmn: "SmartThings", vid: "generic-4-button" //US
+		fingerprint mfr: "5254", prod: "0001", model: "8510", deviceJoinName: "Remotec ZRC-90", mnmn: "SmartThings", vid: "generic-8-button" //EU
 	}
 
 	tiles(scale: 2) {
@@ -64,6 +64,7 @@ def updated() {
 
 def initialize() {
 	def numberOfButtons = prodNumberOfButtons[zwaveInfo.prod]
+	if (isRemotec()) numberOfButtons = 8
 	sendEvent(name: "numberOfButtons", value: numberOfButtons, displayed: false)
 	if(isUntrackedAeotec() || isUntrackedFibaro()) {
 		sendEvent(name: "DeviceWatch-Enroll", value: JsonOutput.toJson([protocol: "zwave", scheme:"untracked"]), displayed: false)
@@ -218,18 +219,22 @@ private getProdNumberOfButtons() {[
 		"0002" : 4,
 		"0101" : 4,
 		"0001" : 4,
-		"0200" : 4,
-		"0201" : 4
+		"0200" : 4
 ]}
 
 private getSupportedButtonValues() {
 	def values = ["pushed", "held"]
 	if (isFibaro()) values += ["double", "down_hold", "pushed_3x"]
+	if (isRemotec()) values += ["double", "down_hold"]
 	return values
 }
 
 private isFibaro() {
 	zwaveInfo.mfr?.contains("010F")
+}
+
+private isRemotec() {
+	zwaveInfo.mfr?.contains("5254")
 }
 
 private isUntrackedFibaro() {
