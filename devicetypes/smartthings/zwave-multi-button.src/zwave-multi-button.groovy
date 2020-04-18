@@ -32,6 +32,7 @@ metadata {
 		fingerprint mfr: "0086", prod: "0101", model: "0058", deviceJoinName: "Aeotec KeyFob", mnmn: "SmartThings", vid: "generic-4-button" //US
 		fingerprint mfr: "0086", prod: "0001", model: "0058", deviceJoinName: "Aeotec KeyFob", mnmn: "SmartThings", vid: "generic-4-button" //EU
 		fingerprint mfr: "010F", prod: "1001", model: "3000", deviceJoinName: "Fibaro KeyFob", mnmn: "SmartThings", vid: "generic-6-button" //AU
+		fingerprint mfr: "0208", prod: "0200", model: "000B", deviceJoinName: "Hank Four-key Scene Controller", mnmn: "SmartThings", vid: "generic-4-button" //EU
 	}
 
 	tiles(scale: 2) {
@@ -215,7 +216,8 @@ private getProdNumberOfButtons() {[
 		"0102" : 4,
 		"0002" : 4,
 		"0101" : 4,
-		"0001" : 4
+		"0001" : 4,
+		"0200" : 4
 ]}
 
 private getSupportedButtonValues() {
